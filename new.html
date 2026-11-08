@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DANAI หมูปิ้ง - ระบบสั่งซื้อล่วงหน้า & แจ้งเวลานัดรับ</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <!-- Google Fonts Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --brand-red: #d9381e;
+            --brand-dark: #121212;
+            --brand-bg: #fffbf7;
+        }
+
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: var(--brand-bg);
+            color: #222;
+        }
+
+        .bg-brand-dark {
+            background-color: var(--brand-dark) !important;
+        }
+
+        .text-brand-red {
+            color: var(--brand-red) !important;
+        }
+
+        .btn-brand {
+            background-color: var(--brand-red);
+            color: white;
+            font-weight: 600;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-brand:hover {
+            background-color: #b3250e;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(217, 56, 30, 0.3);
+        }
+
+        /* Banner Style */
+        .hero-banner {
+            background: linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.85)), 
+                        url('img/S__32710674.jpg') center/cover no-repeat;
+            padding: 90px 20px;
+            border-bottom: 4px solid var(--brand-red);
+        }
+
+        .card-menu {
+            border: none;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+            background: #fff;
+        }
+
+        .card-menu:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(217, 56, 30, 0.18);
+        }
+
+        .card-menu img {
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .order-card {
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 2px solid #ffefe8;
+        }
+
+        .logo-img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--brand-red);
+        }
+
+        .map-container {
+            border-radius: 16px;
+            overflow: hidden;
+            min-height: 350px;
+        }
+
+        textarea.hidden-copy {
+            opacity: 0;
+            position: absolute;
+            z-index: -9999;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-brand-dark sticky-top shadow">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center fw-bold fs-4" href="#">
+                <img src="img/danai-logo.png.jpg" alt="DANAI Logo" class="logo-img me-2">
+                <span>DANAI <span class="text-brand-red">หมูปิ้ง</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="menu">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item me-2">
+                        <a class="nav-link active" href="#menu-section"><i class="bi bi-egg-fried me-1"></i> เมนูหมูปิ้ง</a>
+                    </li>
+                    <li class="nav-item me-2">
+                        <a class="nav-link text-warning fw-bold" href="#order-section"><i class="bi bi-bag-check-fill me-1"></i> สั่งอาหารล่วงหน้า</a>
+                    </li>
+                    <li class="nav-item me-2">
+                        <a class="nav-link" href="#about-section"><i class="bi bi-info-circle me-1"></i> บริการพรีออเดอร์</a>
+                    </li>
+                    <li class="nav-item me-2">
+                        <a class="nav-link" href="#contact-section"><i class="bi bi-geo-alt me-1"></i> ติดต่อ & พิกัดร้าน</a>
+                    </li>
+                    <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+                        <a class="btn btn-brand rounded-pill px-3 fw-bold" href="tel:0643578342">
+                            <i class="bi bi-telephone-fill me-1"></i> โทร 064-357-8342
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Banner -->
+    <section class="hero-banner text-center text-white">
+        <div class="container">
+            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold mb-3">
+                <i class="bi bi-clock-history me-1"></i> Chat-to-Pack System
+            </span>
+            <h1 class="display-3 fw-bold text-white mb-2">DANAI หมูปิ้งพรีออเดอร์</h1>
+            <p class="fs-5 text-light opacity-90 max-w-600 mx-auto mb-4">
+                บริการสั่งหมูปิ้งล่วงหน้า แยกส่งตามสำนักงาน/แผนก (Separate Delivery by Office)<br>
+                ย่างสดใหม่ร้อนๆ พร้อมส่งตรงถึงมือตามเวลานัดหมาย ไม่ต้องยืนรอคิว!
+            </p>
+            <a href="#order-section" class="btn btn-brand btn-lg px-4 py-3 rounded-pill shadow">
+                <i class="bi bi-cart-plus me-2"></i> สั่งอาหารล่วงหน้า / ระบุเวลารับ
+            </a>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <div class="container mt-5 pt-3" id="menu-section">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold display-6">รายการสินค้า & บริการจัดชุด</h2>
+            <p class="text-muted">บริการรับพรีออเดอร์หมูปิ้งเตาถ่านสดใหม่</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card card-menu h-100">
+                    <img src="img/S__32710674.jpg" class="card-img-top" alt="หมูปิ้งสูตรเด็ดเตาถ่าน">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="card-title fw-bold mb-0">หมูปิ้งสูตรเด็ดเตาถ่าน</h5>
+                            <span class="fw-bold text-brand-red fs-5">10.-/ไม้</span>
+                        </div>
+                        <p class="card-text text-muted small mb-4">หมักเครื่องเทศเข้มข้น ย่างเตาถ่านหอมกรุ่น มันแทรกกำลังดี</p>
+                        <button class="btn btn-outline-danger mt-auto rounded-pill" data-bs-toggle="modal" data-bs-target="#modal1">
+                            <i class="bi bi-search me-1"></i> ดูรายละเอียด
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card card-menu h-100">
+                    <img src="img/S__33062918.jpg" class="card-img-top" alt="แพ็คอุ่นพร้อมทาน">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="card-title fw-bold mb-0">แพ็คหมูปิ้งพร้อมทาน/แพ็คหมูหมักพร้อมปิ้ง</h5>
+                            <span class="fw-bold text-brand-red fs-5">10.-/ไม้</span>
+                        </div>
+                        <p class="card-text text-muted small mb-4">ซีลแพ็กสะอาดพร้อมทาน หรือนำเข้าไมโครเวฟอุ่นร้อนได้ทันที สะดวก อร่อยสดใหม่</p>
+                        <button class="btn btn-outline-danger mt-auto rounded-pill" data-bs-toggle="modal" data-bs-target="#modal2">
+                            <i class="bi bi-search me-1"></i> ดูรายละเอียด
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card card-menu h-100">
+                    <img src="img/S__32710677.jpg" class="card-img-top" alt="จัดถุงพรีออเดอร์">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="card-title fw-bold mb-0">จัดถุงพรีออเดอร์แยกรายบุคคล</h5>
+                            <span class="fw-bold text-brand-red fs-5">ตามสั่ง</span>
+                        </div>
+                        <p class="card-text text-muted small mb-4">บริการแยกแพ็กถุงตามชื่อและแผนก เพิ่มความสะดวกยามเช้า</p>
+                        <button class="btn btn-outline-danger mt-auto rounded-pill" data-bs-toggle="modal" data-bs-target="#modal3">
+                            <i class="bi bi-search me-1"></i> ดูรายละเอียด
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order & Pickup Section -->
+    <section class="container mt-5 pt-4" id="order-section">
+        <div class="order-card p-4 p-md-5">
+            <div class="text-center mb-4">
+                <span class="badge bg-danger px-3 py-2 rounded-pill mb-2 fw-bold">
+                    <i class="bi bi-alarm me-1"></i> Pre-Order Form
+                </span>
+                <h3 class="fw-bold mb-1">ฟอร์มสั่งอาหารล่วงหน้า & กำหนดเวลารับ</h3>
+                <p class="text-muted small">เมื่อกดสั่งซื้อ ระบบจะคัดลอกคำสั่งซื้อและเปิด LINE ของร้านให้อัตโนมัติ</p>
+            </div>
+
+            <form id="preorderForm">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">ชื่อผู้สั่ง / ชื่อผู้รับ</label>
+                        <input type="text" class="form-control form-control-lg fs-6" id="custName" placeholder="เช่น พี่เมย์ / คุณโอ" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">เบอร์โทรศัพท์ติดต่อ</label>
+                        <input type="tel" class="form-control form-control-lg fs-6" id="custPhone" placeholder="08X-XXX-XXXX" required>
+                    </div>
+
+                    <!-- จำนวนสินค้า -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">หมูปิ้งเตาถ่าน (10.-)</label>
+                        <input type="number" class="form-control form-control-lg fs-6 calc-item" id="qtyPork" min="0" value="0">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">ข้าวเหนียวนุ่ม (10.-)</label>
+                        <input type="number" class="form-control form-control-lg fs-6 calc-item" id="qtyRice" min="0" value="0">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">ชุดรวม (หมู 4 + เหนียว 1 = 50.-)</label>
+                        <input type="number" class="form-control form-control-lg fs-6 calc-item" id="qtySet" min="0" value="0">
+                    </div>
+
+                    <!-- เวลาและจุดส่ง -->
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold text-danger"><i class="bi bi-clock-fill me-1"></i> ระบุเวลานัดรับ / จัดส่ง (เริ่ม 08:00 น.)</label>
+                        <input type="time" class="form-control form-control-lg fs-6" id="pickupTime" min="08:00" value="08:00" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold"><i class="bi bi-geo-alt-fill me-1"></i> จุดรับสินค้า / สำนักงาน</label>
+                        <select class="form-select form-select-lg fs-6" id="officeLocation">
+                            <option value="สำนักงาน 1 (Office 1)">สำนักงาน 1 (Office 1)</option>
+                            <option value="สำนักงาน 2 (Office 2)">สำนักงาน 2 (Office 2)</option>
+                            <option value="สำนักงาน 3 (Office 3)">สำนักงาน 3 (Office 3)</option>
+                            <option value="มารับเองที่หน้าร้าน (LP Mansion พหล 44)">มารับเองที่หน้าร้าน (แอลพีแมนชั่น พหลโยธิน 44)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-bold">รายละเอียดจัดชุดแยกถุง (Chat-to-Pack System)</label>
+                        <textarea class="form-control" id="note" rows="3" placeholder="ระบุการแยกถุง เช่น พี่เมย์ หมู 5 เหนียว 1 / พี่โอ หมู 3 เหนียว 1"></textarea>
+                    </div>
+
+                    <!-- ราคารวม -->
+                    <div class="col-12 bg-light p-3 rounded-3 d-flex justify-content-between align-items-center my-3 border">
+                        <span class="fs-5 fw-bold">ราคารวมทั้งหมด:</span>
+                        <span class="fs-2 fw-bold text-brand-red"><span id="totalPrice">0</span> บาท</span>
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-success btn-lg w-100 py-3 rounded-pill fs-5 fw-bold shadow-sm">
+                            <i class="bi bi-line me-2"></i> ส่งคำสั่งซื้อเข้า LINE ร้าน
+                        </button>
+                        <!-- ข้อความแนะนำวิธีวางออเดอร์ -->
+                        <div class="text-center mt-2">
+                            <small class="text-muted"><i class="bi bi-info-circle text-success me-1"></i> (เมื่อกดสั่งซื้อแล้ว ให้กดแตะค้างที่ช่องแชท LINE แล้วเลือก <strong>"วาง (Paste)"</strong> เพื่อส่งออเดอร์ได้ทันที)</small>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Hidden Copy Area -->
+    <textarea id="hiddenCopyArea" class="hidden-copy" readonly></textarea>
+
+    <!-- About Section -->
+    <section class="container mt-5 pt-4" id="about-section">
+        <div class="row align-items-center g-4">
+            <div class="col-md-6">
+                <img src="img/S__32710669.jpg" class="img-fluid rounded-4 shadow" alt="ระบบพรีออเดอร์">
+            </div>
+            <div class="col-md-6">
+                <span class="badge bg-danger mb-2">Chat-to-Pack System</span>
+                <h2 class="fw-bold mb-2">เราคือใคร?</h2>
+                <h5 class="text-brand-red fw-bold mb-3">ผู้เชี่ยวชาญด้านการรับพรีออเดอร์จัดชุด</h5>
+                <p class="text-muted">
+                    เราช่วยให้อาหารเช้าของคุณและเพื่อนร่วมงานเป็นเรื่องง่าย ด้วยระบบจัดส่งพรีออเดอร์หมูปิ้งเตาถ่านแยกบรรจุรายบุคคล
+                </p>
+                <div class="d-flex align-items-start mb-3">
+                    <i class="bi bi-box-seam fs-3 text-brand-red me-3"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1">ระบบรับพรีออเดอร์ & จัดชุด (Chat-to-Pack System)</h6>
+                        <p class="small text-muted mb-0">แยกแพ็กถุงตามชื่อและรายการที่สั่ง ชัดเจน แจกจ่ายง่าย</p>
+                    </div>
+                </div>
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-building fs-3 text-brand-red me-3"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1">แยกส่งตามสำนักงาน (Separate Delivery by Office)</h6>
+                        <p class="small text-muted mb-0">จัดส่งถึงสำนักงาน 1, 2, 3 ตามจุดนัดหมายอย่างแม่นยำ</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact & Location Section -->
+    <section class="container mt-5 pt-4" id="contact-section">
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
+            <h3 class="fw-bold mb-4"><i class="bi bi-geo-alt-fill text-brand-red me-2"></i> ติดต่อเรา & พิกัดสถานที่ตั้งร้าน</h3>
+            
+            <div class="row g-4">
+                <div class="col-lg-5">
+                    <div class="bg-light p-4 rounded-4 h-100 border">
+                        <h5 class="fw-bold text-brand-red mb-3">DANAI หมูปิ้ง</h5>
+                        
+                        <div class="mb-3 d-flex align-items-start">
+                            <i class="bi bi-geo-alt fs-5 text-brand-red me-3 mt-1"></i>
+                            <div>
+                                <strong>สถานที่ตั้งร้าน:</strong><br>
+                                <span class="text-muted">แอลพีแมนชั่น ซอยพหลโยธิน 44 ถนนพหลโยธิน แขวงเสนานิคม เขตจตุจักร กรุงเทพมหานคร 10900</span>
+                                <div class="mt-2">
+                                    <a href="https://maps.app.goo.gl/S3X7KyDbvPKdaP3B6" target="_blank" class="btn btn-sm btn-outline-danger rounded-pill">
+                                        <i class="bi bi-box-arrow-up-right me-1"></i> เปิดในแอป Google Maps
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 d-flex align-items-start">
+                            <i class="bi bi-telephone fs-5 text-brand-red me-3 mt-1"></i>
+                            <div>
+                                <strong>เบอร์โทรศัพท์ติดต่อ:</strong><br>
+                                <a href="tel:0643578342" class="text-danger fw-bold text-decoration-none">064-357-8342</a><br>
+                                <span class="text-muted">เบอร์สำรอง: </span><a href="tel:0626296544" class="text-dark fw-bold text-decoration-none">062-629-6544</a>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-line fs-5 text-success me-3"></i>
+                            <div>
+                                <strong>LINE Official / พรีออเดอร์:</strong><br>
+                                <a href="https://lin.ee/x1f6zlT" target="_blank" class="btn btn-sm btn-success rounded-pill px-3 mt-1">
+                                    <i class="bi bi-chat-dots me-1"></i> แอด LINE พรีออเดอร์
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="mb-0 d-flex align-items-start">
+                            <i class="bi bi-clock fs-5 text-brand-red me-3 mt-1"></i>
+                            <div>
+                                <strong>เวลาเปิด-ปิด ร้าน:</strong><br>
+                                <span class="text-muted">จันทร์ - ศุกร์: 05.30 น. - 10.30 น.</span><br>
+                                <span class="text-muted">เสาร์ - อาทิตย์: 06.00 น. - 11.00 น.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-7">
+                    <div class="map-container shadow-sm border h-100">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3874.15286591398!2d100.58284067586561!3d13.84784409549301!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29d0124ad993d%3A0xb3caefea94812f84!2z4LmB4Lit4Lil4Lie4Li14LmB4Lih4LmI4LiK4Lix4LmZ!5e0!3m2!1sth!2sth!4v1700000000000!5m2!1sth!2sth" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0; min-height: 350px;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modals -->
+    <div class="modal fade" id="modal1" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold">หมูปิ้งสูตรเด็ดเตาถ่าน</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="img/S__32710674.jpg" class="img-fluid rounded mb-3">
+                    <p class="text-start">หมูปิ้งย่างสดใหม่บนเตาถ่าน หอมกลิ่นย่าง หมักเข้าเนื้อฉ่ำๆ รสชาติเข้มข้นถึงใจ</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal2" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold">แพ็คอุ่นพร้อมทาน</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="img/S__32710670.jpg" class="img-fluid rounded mb-3">
+                    <p class="text-start">บรรจุแพ็คอย่างดี สะอาด สะดวก สามารถเข้าไมโครเวฟอุ่นร้อนได้ทันที เหมาะสำหรับทานที่ออฟฟิศ</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modal3" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold">บริการบรรจุถุงแยกตามสั่ง</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="img/S__32710677.jpg" class="img-fluid rounded mb-3">
+                    <p class="text-start">บรรจุใส่ถุงกระดาษอย่างเป็นระเบียบ พร้อมติดป้ายชื่อรายการ สะดวกต่อการแจกจ่ายในออฟฟิศ</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer text-center text-white bg-brand-dark mt-5 p-4">
+        <div class="container">
+            <div class="mb-3">
+                <a href="#" class="text-white fs-4 me-3"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="text-white fs-4 me-3"><i class="bi bi-instagram"></i></a>
+                <a href="https://lin.ee/x1f6zlT" target="_blank" class="text-white fs-4"><i class="bi bi-line"></i></a>
+            </div>
+            <p class="small text-muted mb-0">© 2025 DANAI หมูปิ้ง - Pre-Order & Chat-to-Pack Delivery System</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Bootstrap & Robust LINE Integration -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
